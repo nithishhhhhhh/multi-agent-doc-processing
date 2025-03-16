@@ -1,0 +1,85 @@
+### **Week 1 - Task 1: Setup Cloud Environment **  
+
+## **Step 1: Create an AWS S3 Bucket**
+We need a storage location for the input documents.
+
+1. Log in to **AWS Console**.
+2. Navigate to **S3** → Click **"Create bucket"**.
+3. Set a **Bucket name** (must be unique, e.g., `document-processing-bucket`).
+4. Choose a **region** (e.g., `us-east-1`).
+5. Enable **"Block all public access"** (for security).
+6. Enable **versioning** (optional but useful).
+7. Click **Create bucket**.
+
+✅ **Your S3 bucket is now ready.**
+
+---
+
+## **Step 2: Configure AWS Lambda Function**
+We will create a **serverless function** that triggers when a file is uploaded to S3.
+
+### **2.1 Create a New Lambda Function**
+1. Navigate to **AWS Lambda** → Click **"Create function"**.
+2. Choose **"Author from scratch"**.
+3. Set **Function name**: `s3_file_trigger`.
+4. Select **Runtime**: `Python 3.9+`.
+5. Choose **Execution role**: Create a new role with **S3 read permissions**.
+6. Click **Create function**.
+
+### **2.2 Add S3 Trigger**
+1. Scroll down to the **"Function Triggers"** section.
+2. Click **"Add trigger"**.
+3. Select **S3** as the source.
+4. Choose the **S3 bucket** created earlier.
+5. Set **Event type** to `"PUT"` (triggers on new uploads).
+6. Click **"Add"**.
+
+✅ **Now, your Lambda function will trigger on new file uploads.**
+
+---
+
+## **Step 3: Write & Deploy Lambda Function**
+We will write a **Python script** that logs new file uploads.
+
+1. Open **AWS Lambda** → Select the `s3_file_trigger` function.
+2. In the **Code** section, replace the default code with:
+
+   ```python
+   import json
+   import boto3
+
+   def lambda_handler(event, context):
+       # Extract bucket name and file key from event
+       s3_event = event['Records'][0]['s3']
+       bucket_name = s3_event['bucket']['name']
+       file_key = s3_event['object']['key']
+       
+       print(f"New file detected: s3://{bucket_name}/{file_key}")
+
+       return {
+           'statusCode': 200,
+           'body': json.dumps(f"Processed file: {file_key}")
+       }
+   ```
+
+3. Click **Deploy**.
+
+✅ **Now, every time a file is uploaded, this function logs the event.**
+
+---
+
+## **Step 5: Test the Setup**
+### **5.1 Upload a File to S3**
+1. Navigate to **S3** → Open your bucket.
+2. Click **Upload** → Select a test PDF or image.
+3. Click **Upload**.
+
+### **5.2 Verify Lambda Execution**
+1. Navigate to **AWS Lambda** → Open the `s3_file_trigger` function.
+2. Click **"Monitor"** → View **Logs in CloudWatch**.
+3. Look for an entry like:
+   ```
+   New file detected: s3://document-processing-bucket/sample.pdf
+   ```
+
+✅ **Your setup is complete! You now have a cloud-based event-driven document pipeline.**
