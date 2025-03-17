@@ -42,7 +42,7 @@ We will create a **serverless function** that triggers when a file is uploaded t
 We will write a **Python script** that logs new file uploads.
 
 1. Open **AWS Lambda** → Select the `s3_file_trigger` function.
-2. In the **Code** section, replace the default code with:
+2. In the **Code** section, replace the code with the code given in next section:
 
    ```python
    import json
